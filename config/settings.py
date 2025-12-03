@@ -149,10 +149,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': { # 429 Too many requests
+        'user': '1000/hour',
+        'anon': '100/day',
+    },
 }
 
 if DEBUG:
@@ -161,11 +175,10 @@ if DEBUG:
         'REFRESH_TOKEN_LIFETIME': timedelta(weeks=4),
     }
 
-CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
-    # 'http://localhost:3000',
+    'http://localhost:3000',
 ]
 
 # ---- END MY CONFIGS ----

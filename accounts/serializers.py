@@ -3,7 +3,6 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from rest_framework.reverse import reverse
 
-
 from .models import Relation
 
 
@@ -68,6 +67,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'id',
             'username',
             'email',
             'first_name',
