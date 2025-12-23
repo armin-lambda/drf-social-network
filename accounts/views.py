@@ -9,6 +9,7 @@ from utils.permissions import (
     IsNotSelf,
     IsOwnerOrReadOnly
 )
+from posts.serializers import PostListSerializer
 from .models import Relation
 from .serializers import (
     RegisterSerializer,
@@ -102,3 +103,16 @@ class FollowingListView(generics.ListAPIView):
         username = self.kwargs.get('username')
         user = get_object_or_404(User, username=username)
         return user.get_following()
+
+
+class UserPostListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostListSerializer
+    lookup_field = 'username'
+    filter_backends = [filters.SearchFilter]
+    fields = ['description', 'body']
+
+    def get_queryset(self):
+        username = self.kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        return user.get_posts()

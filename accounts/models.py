@@ -107,6 +107,12 @@ class CustomUser(AbstractUser):
     
     def get_following_count(self):
         return self.following.count()
+    
+    def get_posts(self):
+        return self.posts.all()
+    
+    def get_posts_count(self):
+        return self.posts.count()
 
 
 class Relation(models.Model):
@@ -119,13 +125,4 @@ class Relation(models.Model):
         unique_together = ['from_user', 'to_user']
     
     def __str__(self):
-        return f"{self.from_user} -> {self.to_user}"
-    
-    def clean(self):
-        super().clean()
-        if self.from_user == self.to_user:
-            raise ValidationError('Users cannot follow themselves.')
-    
-    def save(self, *args, **kwargs):
-        self.clean()
-        return super().save(*args, **kwargs)
+        return f"{self.from_user} followed {self.to_user}"

@@ -35,4 +35,4 @@ class Comment(models.Model):
         return self.get_short_body()
     
     def get_short_body(self):
-        (self.body[:20] + '...') if len(self.body) > 20 else self.body
+        return (self.body[:20] + '...') if len(self.body) > 20 else self.body

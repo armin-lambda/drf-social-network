@@ -57,8 +57,10 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    posts_count = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
+    post_list_url = serializers.SerializerMethodField()
     follower_list_url = serializers.SerializerMethodField()
     following_list_url = serializers.SerializerMethodField()
     follow_url = serializers.SerializerMethodField()
@@ -78,13 +80,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'linkedin_url',
             'bio',
             'image',   
+            'posts_count',
             'followers_count',
             'following_count',
+            'post_list_url',
             'follower_list_url',
             'following_list_url',
             'follow_url',
             'unfollow_url',
         ]
+    
+    def get_posts_count(self, obj):
+        return obj.get_posts_count()
     
     def get_followers_count(self, obj):
         return obj.get_followers_count()
@@ -92,6 +99,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_following_count(self, obj):
         return obj.get_following_count()
 
+    def get_post_list_url(self, obj):
+        request = self.context.get('request')
+        return reverse('accounts:post_list', kwargs={'username': obj.username}, request=request)
+    
     def get_follower_list_url(self, obj):
         request = self.context.get('request')
         return reverse('accounts:follower_list', kwargs={'username': obj.username}, request=request)
@@ -102,14 +113,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     def get_follow_url(self, obj):
         request = self.context.get('request')
-        if not Relation.objects.filter(from_user=request.user, to_user=obj).exists():
-            return reverse('accounts:follow', kwargs={'username': obj.username}, request=request)
+        if obj != request.user:
+            if not Relation.objects.filter(from_user=request.user, to_user=obj).exists():
+                return reverse('accounts:follow', kwargs={'username': obj.username}, request=request)
         return None
     
     def get_unfollow_url(self, obj):
         request = self.context.get('request')
-        if Relation.objects.filter(from_user=request.user, to_user=obj).exists():
-            return reverse('accounts:unfollow', kwargs={'username': obj.username}, request=request)
+        if obj != request.user:
+            if Relation.objects.filter(from_user=request.user, to_user=obj).exists():
+                return reverse('accounts:unfollow', kwargs={'username': obj.username}, request=request)
         return None
 
 
